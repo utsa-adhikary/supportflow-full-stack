@@ -1,7 +1,7 @@
 const { getdb } = require("../utils/database");
 const createJWT = require("../utils/createJWT");
 const bcrypt = require("bcrypt");
-require("dotenv").config();
+require("dotenv").config({ quiet: true });
 
 async function register(req, res) {
     try {
@@ -31,7 +31,7 @@ async function register(req, res) {
         if (await db.collection("users").findOne({ email })) {
             return res.status(409).json({
                 success: false,
-                error: "Email already registered"
+                error: "Email is already registered"
             });
         }
 
@@ -41,7 +41,7 @@ async function register(req, res) {
         // jwt token
         const token = createJWT(
             {
-                _id: user.insertedId.toString(),
+                _id: user.insertedId,
                 name: name,
                 role: "customer"
             }, process.env.JWT_SECRET, process.env.JWT_EXPIRES_IN);
@@ -51,7 +51,7 @@ async function register(req, res) {
 
         res.status(201).json({
             success: true,
-            message: "User registered"
+            message: "Registration successful"
         });
 
     } catch (error) {
@@ -109,21 +109,24 @@ async function login(req, res) {
 
         res.status(200).json({
             success: true,
-            message: "Login Successfull"
+            message: "Login successful"
         });
 
     } catch (error) {
         console.log(error);
         res.status(500).json({
             success: false,
-            error: "login failed"
+            error: "Internal server error"
         })
     }
 }
 
 async function me(req, res) {
     try {
-        return res.status(200).json(req.user);
+        return res.status(200).json({
+            success: true,
+            user: req.user
+        });
     } catch (error) {
         console.log(error);
         res.status(500).json({

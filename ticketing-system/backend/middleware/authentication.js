@@ -3,7 +3,7 @@ const getCookies = require("../utils/cookieParser");
 const { getdb } = require("../utils/database");
 const { ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
+require("dotenv").config({ quiet: true });
 
 async function authentication(req, res, next) {
     const cookieObj = getCookies(req.headers.cookie);
@@ -12,7 +12,7 @@ async function authentication(req, res, next) {
         return res.status(401).json(
             {
                 success: false,
-                error: "not logged in"
+                error: "Authentication required"
             }
         );
     }
@@ -31,7 +31,10 @@ async function authentication(req, res, next) {
         };
 
     } catch (error) {
-        return res.status(401).json({ error: `Token verification failed: ${error.message}` });
+        return res.status(401).json({
+            success: false,
+            error: "Invalid or expired token"
+        });
     }
 
     next();

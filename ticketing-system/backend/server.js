@@ -5,7 +5,7 @@ const ticketRouter = require("./routes/ticketRoutes");
 const msgRouter = require("./routes/msgRoutes");
 const adminRouter = require("./routes/adminRoutes");
 const seedData = require("./seed/seedData");
-require("dotenv").config();
+require("dotenv").config({ quiet: true});
 
 const cors = require('cors');
 const app = express();

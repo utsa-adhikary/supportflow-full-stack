@@ -7,11 +7,8 @@ async function getChat(req, res) {
         if (!ObjectId.isValid(req.params.ticket_id)) {
 
             return res.status(400).json({
-
                 success: false,
-
-                message: "Invalid ticket id"
-
+                error: "Invalid ticket id"
             });
 
         }
@@ -21,23 +18,21 @@ async function getChat(req, res) {
         if (!ticket || (req.user.role !== "admin" && ticket.createdBy.toString() !== req.user._id.toString())) {
             return res.status(404).json({
                 success: false,
-                message: "ticket not found"
+                error: "ticket not found"
             })
         }
 
         const targetChat = await msgModel.getChat(req.params.ticket_id);
 
-        return res.status(200).json(
-            {
-                status: "success",
-                targetChat
-            }
-        );
+        return res.status(200).json({
+            success: true,
+            message: targetChat
+        });
 
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Unable to fetch messages"
+            error: "Unable to fetch messages"
         });
     }
 
@@ -51,9 +46,7 @@ async function sendChat(req, res) {
             return res.status(400).json({
 
                 success: false,
-
-                message: "Invalid ticket id"
-
+                error: "Invalid ticket id"
             });
 
         }
@@ -63,7 +56,7 @@ async function sendChat(req, res) {
         if (!ticket || (req.user.role !== "admin" && ticket.createdBy.toString() !== req.user._id.toString())) {
             return res.status(404).json({
                 success: false,
-                message: "ticket not found"
+                error: "Ticket not found"
             })
         }
 
@@ -74,7 +67,7 @@ async function sendChat(req, res) {
         if (!text || text.length > 2000) {
             return res.status(400).json({
                 success: false,
-                message: "text cannot be empty or exit maxlimit of 2000"
+                error: "Message text is required and must not exceed 2000 characters"
             })
         }
 
@@ -88,17 +81,17 @@ async function sendChat(req, res) {
             timestamp: new Date()
         };
 
-        await sendChat(req.params.ticket_id, newMsg);
+        await msgModel.sendChat(req.params.ticket_id, newMsg);
 
         return res.status(200).json({
-            status: "success",
-            message: "message send successfull"
+            success: true,
+            message: "Message sent successfully"
         });
 
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Unable to send message"
+            error: "Internal Error"
         });
     }
 }
