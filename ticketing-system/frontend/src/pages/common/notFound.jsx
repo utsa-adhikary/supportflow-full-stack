@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import { useContext } from "react";
-import { MyContext } from "../../App";
+import { ProfileContext } from "../../App";
 
 export default function NotFound() {
-    const [profile] = useContext(MyContext);
+    const { profile } = useContext(ProfileContext);
 
     return (
         <main className="w-full min-h-screen bg-slate-50 flex justify-center items-center p-4 sm:p-6 md:p-8">
@@ -23,7 +23,7 @@ export default function NotFound() {
                 </p>
 
                 <Link
-                    to={`/${profile || "user"}/dashboard`}
+                    to="/dashboard"
                     className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-xs transition duration-150 active:scale-95 w-full justify-center"
                 >
                     <ArrowLeft size={14} />

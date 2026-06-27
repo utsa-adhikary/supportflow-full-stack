@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { Compass } from "lucide-react";
 import { useContext } from "react";
-import { MyContext } from "../../App";
+import { ProfileContext } from "../../App";
 
 export default function UnderProcess() {
-    const [profile] = useContext(MyContext);
+    const { profile } = useContext(ProfileContext);
 
     return (
         <main className="w-full min-h-screen bg-slate-50 flex justify-center items-center p-4 sm:p-6 md:p-8">
@@ -31,7 +31,7 @@ export default function UnderProcess() {
                 </div>
 
                 <Link
-                    to={`/${profile || "user"}/dashboard`}
+                    to="/dashboard"
                     className="inline-flex px-4 py-2.5 text-xs font-bold rounded-xl border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 hover:text-slate-800 transition duration-150 active:scale-95 w-full justify-center"
                 >
                     Go Back Home

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Shapes, Ticket } from "lucide-react";
 
-export default function TicketCard({ data }) {
+export function TicketCard({ data }) {
 
     const dateObj = new Date(data.createdAt);
 
@@ -134,6 +134,70 @@ export default function TicketCard({ data }) {
                         <div className={`px-3 py-1 rounded-full text-sm font-medium border backdrop-blur-sm ${priorityColors[data.priority] || "bg-slate-50 text-slate-700 border-slate-200"}`}>
                             {data.priority}
                         </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+}
+
+export function TicketCardSkeleton() {
+    return (
+        <>
+            {/* Desktop Skeleton */}
+            <div className="hidden lg:block mb-4">
+                <div className="w-full bg-white border border-slate-200 rounded-2xl p-5 flex justify-between items-center gap-8 shadow-sm">
+                    {/* Left Side */}
+                    <div className="flex items-center gap-5 min-w-0 flex-1 animate-pulse">
+                        {/* Ticket Icon Placeholder */}
+                        <div className="size-12 rounded-xl bg-slate-200 shrink-0" />
+
+                        {/* Content Placeholders */}
+                        <div className="min-w-0 flex-1 space-y-2">
+                            <div className="h-4 bg-slate-200 rounded w-1/3" />
+                            <div className="h-3 bg-slate-200 rounded w-1/4" />
+                        </div>
+                    </div>
+
+                    {/* Right Side */}
+                    <div className="flex items-center gap-6 shrink-0 animate-pulse">
+                        {/* Status Badge Placeholder */}
+                        <div className="h-7 w-20 bg-slate-200 rounded-full" />
+
+                        {/* Date Placeholder */}
+                        <div className="h-4 w-12 bg-slate-200 rounded" />
+
+                        {/* Priority Badge Placeholder */}
+                        <div className="h-7 w-16 bg-slate-200 rounded-full" />
+                    </div>
+                </div>
+            </div>
+
+            {/* Mobile Skeleton */}
+            <div className="lg:hidden p-4">
+                <div className="w-full bg-white border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+                    {/* Left Side */}
+                    <div className="flex items-center gap-4 w-full sm:w-auto flex-1 animate-pulse">
+                        {/* Icon Placeholder */}
+                        <div className="size-12 rounded-xl bg-slate-200 shrink-0" />
+
+                        {/* Content Placeholders */}
+                        <div className="flex-1 min-w-0 space-y-2">
+                            <div className="h-4 bg-slate-200 rounded w-1/2" />
+                            <div className="h-3 bg-slate-200 rounded w-1/3" />
+                        </div>
+                    </div>
+
+                    {/* Right Side */}
+                    <div className="w-full sm:w-auto flex flex-wrap sm:flex-nowrap justify-start sm:justify-end items-center gap-3 animate-pulse">
+                        {/* Status Placeholder */}
+                        <div className="h-7 w-16 bg-slate-200 rounded-full" />
+
+                        {/* Date Placeholder */}
+                        <div className="h-4 w-12 bg-slate-200 rounded" />
+
+                        {/* Priority Placeholder */}
+                        <div className="h-7 w-16 bg-slate-200 rounded-full" />
                     </div>
                 </div>
             </div>

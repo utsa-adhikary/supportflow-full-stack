@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import fetchApi from '../../lib/api';
+import { ProfileContext } from '../../App';
 
 export default function Auth() {
     const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(true);
+    const { profile, setProfile } = useContext(ProfileContext);
 
     async function handleSubmit(event) {
 
@@ -13,6 +15,10 @@ export default function Auth() {
 
         const formData = new FormData(event.currentTarget);
         const formValues = Object.fromEntries(formData.entries());
+        console.log(formValues);
+        console.log(formData);
+
+
 
         if (!validateForm(formValues)) {
             toast.error("Please fill all fields correctly.");
@@ -24,14 +30,21 @@ export default function Auth() {
                 method: "POST",
                 body: JSON.stringify(formValues)
             }
-            const data = fetchApi(`/api/auth/${isLogin ? 'login' : 'register'}`, options);
 
-            console.log(data);
+            const data = await fetchApi(`/api/auth/${isLogin ? 'login' : 'register'}`, options);
 
-            navigate("/user/dashboard");
+            if (data.success === true) {
+                setProfile(data.user);
+                console.log(data.user);
+
+            } else {
+                throw data;
+            }
+
+            navigate("/dashboard");
 
             // success Toast
-            (() => toast.success(`Suvvessfully ${isLogin ? 'log in' : "registered"}`))();
+            (() => toast.success(`Successfully ${isLogin ? 'log in' : "registered"}`))();
 
         } catch (error) {
             console.error(error);
@@ -47,7 +60,7 @@ export default function Auth() {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(data.email)) return false;
 
-        if (data.password.length < 6) return false;
+        if (data.password.length < 4) return false;
 
         if (!isLogin && !data.terms) return false;
 
@@ -114,6 +127,24 @@ export default function Auth() {
 
                     {/* Form */}
                     <form onSubmit={(e) => handleSubmit(e)} className="mt-8 space-y-5">
+
+                        {/* Name Field */}
+                        {isLogin ? "" : <div>
+                            <label htmlFor="name" className="block text-sm font-medium leading-6 text-slate-900">
+                                Username
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    autoComplete="name"
+                                    required
+                                    placeholder="e.g. Jonny Sins"
+                                    className="block w-full rounded-lg border-0 p-2.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                />
+                            </div>
+                        </div>}
 
                         {/* ID / Email Field */}
                         <div>

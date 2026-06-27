@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FolderOpen, Hourglass, CircleCheckBig, Ticket } from "lucide-react";
+import fetchApi from "../../lib/api";
 
 function KPIcard({ data }) {
     return (
@@ -25,11 +26,12 @@ function KPIcard({ data }) {
     );
 }
 
-export default function KPI({ tickets }) {
-    const totalOpen = tickets.filter(t => t.status === "Open").length;
-    const inProgress = tickets.filter(t => t.status === "InProgress").length;
-    const resolvedToday = tickets.filter(t => t.status === "Resolved").length;
-    const totalTickets = tickets.length;
+export function KPI({ stat }) {
+
+    const totalOpen = stat.ticketsByStatus.Open;
+    const inProgress = stat.ticketsByStatus.InProgress;
+    const resolvedToday = stat.resolvedToday;
+    const totalTickets = stat.totalTickets;
 
     const kpis = [
         {
@@ -62,6 +64,32 @@ export default function KPI({ tickets }) {
         <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
             {kpis.map((item, index) => (
                 <KPIcard key={index} data={item} />
+            ))}
+        </div>
+    );
+}
+
+export function KPISkeleton() {
+    return (
+        <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+            {Array.from({ length: 4 }).map((_, index) => (
+                <div
+                    key={index}
+                    className="bg-white border border-slate-200 border-l-4 border-l-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm animate-pulse"
+                >
+                    <div className="flex justify-between items-start gap-2">
+                        {/* Title and Value */}
+                        <div className="min-w-0 flex-1 space-y-2">
+                            {/* Title Placeholder */}
+                            <div className="h-3 sm:h-4 bg-slate-200 rounded w-2/3" />
+                            {/* Value Placeholder */}
+                            <div className="h-7 sm:h-9 bg-slate-200 rounded w-1/2 mt-1 sm:mt-2" />
+                        </div>
+
+                        {/* Icon Placeholder */}
+                        <div className="p-2 bg-slate-100 rounded-xl size-9 sm:size-10 shrink-0 sm:mt-0.5" />
+                    </div>
+                </div>
             ))}
         </div>
     );

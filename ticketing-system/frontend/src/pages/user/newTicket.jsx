@@ -35,7 +35,7 @@ export default function NewTicket() {
 
                 setTitle(""); setCategory(""); setPriority(""); setDescription("");
 
-                navigate("/user/dashboard");
+                navigate("/dashboard");
 
                 // success Toast
                 (() => toast.success("Ticket Created Successfully."))();
@@ -132,7 +132,7 @@ export default function NewTicket() {
                     {/* heading */}
                     <section className="border-b border-slate-100 px-6 py-5 flex flex-col justify-center items-start gap-3">
                         <div className="text-slate-600 transition-colors hover:text-slate-900">
-                            <Link to={"/user/dashboard"} className="flex justify-start items-center gap-2" >
+                            <Link to={"/dashboard"} className="flex justify-start items-center gap-2" >
                                 <ArrowLeft size={16} />
                                 <p className="text-xs font-medium">Back to Dashboard</p>
                             </Link>
@@ -276,7 +276,7 @@ export default function NewTicket() {
                         <button
                             type="button"
                             className="px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 hover:text-slate-800 transition duration-150 active:scale-95"
-                            onClick={() => { handleCancel(); navigate("/user/dashboard") }}
+                            onClick={() => { handleCancel(); navigate("/dashboard") }}
                         >
                             Cancel
                         </button>

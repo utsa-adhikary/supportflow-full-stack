@@ -9,4 +9,6 @@ router.post("/login", express.json(), authController.login);
 
 router.get("/me", authentication, authController.me);
 
+router.get("/logout", authentication, authController.logout);
+
 module.exports = router;

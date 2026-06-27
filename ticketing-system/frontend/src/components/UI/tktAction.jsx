@@ -2,11 +2,49 @@ import { useState, useContext, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ChevronDown, Trash2, Shield, User } from "lucide-react";
 import toast from "react-hot-toast";
-import { MyContext } from "../../App";
+import { ProfileContext } from "../../App";
 import fetchApi from "../../lib/api";
 
-export default function TicketActions({ id, targetTkt, setTargetTkt, deleteTkt, setDeleteTkt }) {
-    const [profile] = useContext(MyContext);
+export function TicketActionsSkeleton() {
+    return (
+        <section className="w-full bg-white border border-slate-200 rounded-2xl shadow-sm p-5 animate-pulse">
+            <div className="flex flex-col gap-4">
+
+                {/* Header Row (Shared Icon + Title Layout) */}
+                <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                    {/* Console Icon */}
+                    <div className="size-4 bg-slate-200 rounded shrink-0" />
+                    {/* Section Title */}
+                    <div className="h-3.5 bg-slate-200 rounded w-44" />
+                </div>
+
+                {/* Main Content Area */}
+                <div className="space-y-4 py-1">
+                    {/* Top segment block (Matches dropdown label/paragraph description) */}
+                    <div className="space-y-2">
+                        <div className="h-3 bg-slate-200 rounded w-28" />
+
+                        {/* Dynamic content placeholder mimicking a dropdown box / body text */}
+                        <div className="h-9 w-full bg-slate-50 border border-slate-200/60 rounded-xl" />
+                    </div>
+                </div>
+
+                {/* Action Buttons Row */}
+                <div className="flex items-center gap-2.5 pt-1">
+                    {/* Primary Action Button (Apply Changes / Mark Resolved) */}
+                    <div className="h-9 flex-1 bg-slate-200 rounded-xl" />
+
+                    {/* Secondary Action Button (Delete Trash Icon) */}
+                    <div className="size-9 bg-slate-200 rounded-xl shrink-0" />
+                </div>
+
+            </div>
+        </section>
+    );
+}
+
+export function TicketActions({ id, targetTkt, setTargetTkt, deleteTkt, setDeleteTkt }) {
+    const { profile } = useContext(ProfileContext);
     const navigate = useNavigate();
 
     const [status, setStatus] = useState("");

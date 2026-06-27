@@ -1,11 +1,26 @@
-import { useContext, useState } from "react";
-import TicketCard from "./ticketCard";
+import { useContext, useEffect, useState } from "react";
+import { TicketCard, TicketCardSkeleton } from "./ticketCard";
 import FilterPopup from "./filter";
 import { Search, Filter, Ticket, X } from "lucide-react";
-import { MyContext } from "../../App";
+import { ProfileContext } from "../../App";
+import { data } from "react-router-dom";
+import fetchApi from "../../lib/api";
 
-export default function TicketView({ tickets, setTickets }) {
-    const [profile] = useContext(MyContext);
+export function TicketViewSkeleton() {
+    return (
+        <div>
+            {Array.from({ length: 5 }).map((val, index) => {
+                return <TicketCardSkeleton key={index} />
+            })}
+        </div>
+    )
+
+}
+
+export function TicketView({ tickets }) {
+
+    const [loading, setLoading] = useState(true);
+    const { profile } = useContext(ProfileContext);
     const [search, setSearch] = useState(false);
     const [searchText, setSearchText] = useState("");
     const [openFilter, setOpenFilter] = useState(false);

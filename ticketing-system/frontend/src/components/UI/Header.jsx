@@ -1,12 +1,13 @@
 import { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { PanelLeftOpen, User, ShieldUser, Plus } from "lucide-react";
-import { MyContext } from "../../App";
+import { ProfileContext } from "../../App";
 import { profileSwitchToast } from "./Toasts";
+import { CircleUserRound } from "lucide-react";
 
 export default function Header({ showSidebar, setShowSidebar }) {
 
-    const [profile, setProfile] = useContext(MyContext);
+    const { profile } = useContext(ProfileContext);
 
     return (
         <header className="sticky top-0 z-30 w-full bg-slate-50/95 backdrop-blur-sm border-b border-slate-200 shadow-sm px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-3 flex items-center justify-between gap-3">
@@ -32,10 +33,8 @@ export default function Header({ showSidebar, setShowSidebar }) {
             {/* Right */}
             <div className="flex items-center gap-2 sm:gap-3">
 
-                {/* Profile */}
-
                 {/* Create Ticket */}
-                {profile === "user" && (
+                {profile.role === "customer" && (
                     <Link to="/tickets/new">
                         <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl flex items-center gap-2 shadow-sm transition-all">
 
@@ -48,6 +47,11 @@ export default function Header({ showSidebar, setShowSidebar }) {
                         </button>
                     </Link>
                 )}
+
+                {/* Profile */}
+                <Link to="/profile">
+                        <CircleUserRound className="w-7 h-7" />
+                </Link>
 
             </div>
 

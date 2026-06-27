@@ -1,33 +1,43 @@
 import { Link, useParams } from "react-router-dom";
-import TktMetadata from "../../components/UI/tktMetadata";
+import { TktMetadata, TktMetadataSkeleton } from "../../components/UI/tktMetadata";
 import { ArrowLeft } from 'lucide-react';
-import ChatSec from "../../components/UI/chatSec";
+import { ChatSec, ChatSecSkeleton } from "../../components/UI/chatSec";
 import { useContext, useState, useEffect } from "react";
-import { MyContext } from "../../App";
+import { ProfileContext } from "../../App";
 import DeleteTicket from "../../components/UI/deletePopUp";
-import TicketActions from "../../components/UI/tktAction";
+import { TicketActions, TicketActionsSkeleton } from "../../components/UI/tktAction";
 import Sidebar from "../../components/UI/sidebar";
 import Header from "../../components/UI/Header";
 import fetchApi from "../../lib/api";
+import { TicketCardSkeleton } from "../../components/UI/ticketCard";
 
 export default function TktDetails() {
 
-    const [profile] = useContext(MyContext);
+    const { profile } = useContext(ProfileContext);
     const { id } = useParams();
-
+    const [loading, setLoading] = useState(true);
     const [showSidebar, setShowSidebar] = useState(false);
 
     const [deleteTkt, setDeleteTkt] = useState(false);
-
+    const [message, setMessage] = useState([]);
     const [targetTkt, setTargetTkt] = useState({});
 
     useEffect(() => {
         (async () => {
             try {
-                const response = await fetchApi(`/api/tickets/${id}`);
-                setTargetTkt(response.ticket);
+                const tktData = await fetchApi(`/api/tickets/${id}`);
+                const msgData = await fetchApi(`/api/tickets/${id}/messages`);
+
+                if (tktData.success === true && msgData.success === true) {
+                    setTargetTkt(tktData.ticket);
+                    setMessage(msgData.message);
+                } else {
+                    throw { tktData, msgData }
+                }
             } catch (error) {
-                console.error("Failed to fetch ticket:", error.message);
+                console.error(error);
+            } finally {
+                setLoading(false);
             }
         })();
     }, []);
@@ -79,22 +89,27 @@ export default function TktDetails() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full">
 
                         <div className="lg:col-span-2 flex flex-col gap-6 min-w-0 w-full">
-                            <TktMetadata targetTkt={targetTkt} />
-                            <TicketActions
-                                id={id}
-                                targetTkt={targetTkt}
-                                setTargetTkt={setTargetTkt}
-                                deleteTkt={deleteTkt}
-                                setDeleteTkt={setDeleteTkt}
-                            />
+
+                            {loading ? <TicketCardSkeleton /> : <TktMetadata targetTkt={targetTkt} />}
+
+                            {loading ? <TicketActionsSkeleton /> :
+                                <TicketActions
+                                    id={id}
+                                    targetTkt={targetTkt}
+                                    setTargetTkt={setTargetTkt}
+                                    deleteTkt={deleteTkt}
+                                    setDeleteTkt={setDeleteTkt}
+                                />}
+
                         </div>
 
                         <div className="lg:col-span-1 w-full lg:sticky lg:top-6">
-                            {/* <ChatSec
-                                targetTkt={targetTkt}
-                                setTargetTkt={setTargetTkt}
-                                id={id}
-                            /> */}
+                            {loading ? <ChatSecSkeleton />
+                                : <ChatSec
+                                    messages={message}
+                                    setMessages={setMessage}
+                                    id={id}
+                                />}
                         </div>
 
                     </div>

@@ -1,85 +1,123 @@
-import { createContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
-import UserDashboard from './pages/user/dashboard';
+import Dashboard from './pages/common/dashboard';
 import NewTicket from './pages/user/newTicket';
 import TktDetails from './pages/common/ticketDetails';
-import AdminDashboard from './pages/admin/dashboard';
 import { Toaster } from "react-hot-toast";
 import NotFound from './pages/common/notFound';
 import UnderProcess from './pages/common/underDevelope';
 import Auth from './pages/common/auth';
+import fetchApi from './lib/api';
+import { useNavigate } from 'react-router-dom';
+import Profile from './pages/common/Profile';
 
-export const MyContext = createContext(null);
+export const ProfileContext = createContext(null);
 
+function ProtectedRoutes({ child }) {
+  const { profile } = useContext(ProfileContext);
+
+  if (!profile) {
+    return <Navigate to="/auth" replace />;
+  } else {
+    return child;
+  }
+}
+
+function PublicRoutes({ child }) {
+  const { profile } = useContext(ProfileContext);
+
+  if (profile) {
+    return <Navigate to="/dashboard" replace />
+  } else {
+    return child;
+  }
+}
+
+function CustomerOnlyRoutes({ child }) {
+  const { profile } = useContext(ProfileContext);
+
+  if (!profile) {
+    return <Navigate to="/auth" replace />;
+  } else {
+    if (profile.role !== "customer") {
+      return <Navigate to="/*" replace />
+    } else {
+      return child;
+    }
+  }
+}
+
+const route = createBrowserRouter([
+  {
+    path: '/',
+    element: <Navigate to="/dashboard" replace />
+  },
+  {
+    path: '/auth',
+    element: <PublicRoutes child={<Auth />} />
+  },
+  {
+    path: '/dashboard',
+    element: <ProtectedRoutes child={<Dashboard />} />
+  },
+  {
+    path: '/profile',
+    element: <ProtectedRoutes child={<Profile />} />
+  },
+  {
+    path: '/tickets/new',
+    element: <CustomerOnlyRoutes child={<NewTicket />} />
+  },
+  {
+    path: '/tickets/:id',
+    element: <ProtectedRoutes child={<TktDetails />} />
+  },
+  {
+    path: "/analytics",
+    element: <ProtectedRoutes child={<UnderProcess />} />
+  },
+  {
+    path: "/settings",
+    element: <ProtectedRoutes child={<UnderProcess />} />
+  },
+  {
+    path: '*',
+    element: <ProtectedRoutes child={<NotFound />} />
+  }
+])
 
 function App() {
 
-  const [profile, setProfile] = useState(() => {
-    const savedProfile = localStorage.getItem("profile");
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    if (savedProfile) {
+  useEffect(() => {
+    async function getProfile() {
       try {
-        return JSON.parse(savedProfile);
-      } catch (e) {
-        console.error("Error parsing profile from localStorage", e);
+        const data = await fetchApi("/api/auth/me");
+        setProfile(data.user);
+      } catch (error) {
+        console.error("Authentication check failed:", error);
+        setProfile(null);
+      } finally {
+        setLoading(false);
       }
     }
+    getProfile();
+  }, []);
 
-    const defaultValue = "user";
-    localStorage.setItem("profile", JSON.stringify(defaultValue));
-    return defaultValue;
-  });
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-indigo-600 font-semibold">Loading...</div>
+      </div>
+    );
+  }
 
-  const route = createBrowserRouter([
-    {
-      path: '/',
-      element: (<Navigate to={`/${profile}/dashboard`} />)
-    },
-    {
-      path: '/auth',
-      element: (<Auth />)
-    },
-    {
-      path: '/user',
-      element: (<Navigate to={'/user/dashboard'} />)
-    },
-    {
-      path: '/user/dashboard',
-      element: <UserDashboard />
-    },
-    {
-      path: '/tickets/new',
-      element: <NewTicket />
-    },
-    {
-      path: '/tickets/:id',
-      element: <TktDetails />
-    },
-    {
-      path: '/admin',
-      element: (<Navigate to={'/admin/dashboard'} />)
-    },
-    {
-      path: '/admin/dashboard',
-      element: <AdminDashboard />
-    },
-    {
-      path: `/${profile}/analytics`,
-      element: <UnderProcess />
-    },
-    {
-      path: `/${profile}/settings`,
-      element: <UnderProcess />
-    },
-    {
-      path: '*',
-      element: <NotFound />
-    }
-  ])
 
   return (
     <>
-      <MyContext.Provider value={[profile, setProfile]} >
+      <ProfileContext.Provider value={{ profile, setProfile }} >
         <Toaster
           position="top-center"
           toastOptions={{
@@ -109,7 +147,7 @@ function App() {
           }}
         />
         <RouterProvider router={route} />
-      </MyContext.Provider>
+      </ProfileContext.Provider>
     </>
   )
 }

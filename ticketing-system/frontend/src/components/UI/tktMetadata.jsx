@@ -1,7 +1,68 @@
 import { Calendar, Hash, Tag, Radio, FileText } from 'lucide-react';
 
-export default function TktMetadata({ targetTkt }) {
-    
+export function TktMetadataSkeleton() {
+    return (
+        <section className="w-full bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden relative animate-pulse">
+            {/* Absolute side accent bar simulator */}
+            <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-slate-200" />
+
+            <div className="p-4 sm:p-5 pl-5 sm:pl-6 flex flex-col gap-4 sm:gap-5">
+
+                {/* Header Section: ID & Priority Badges */}
+                <div className="flex flex-wrap items-center justify-between gap-2.5">
+                    {/* ID Badge */}
+                    <div className="h-6 w-24 bg-slate-200 rounded-lg" />
+
+                    {/* Priority Badge */}
+                    <div className="h-6 w-28 bg-slate-200 rounded-full" />
+                </div>
+
+                {/* Title & Status Row */}
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-slate-100 pb-3">
+                    {/* Title Placeholder */}
+                    <div className="space-y-2 flex-1 w-full sm:max-w-[75%]">
+                        <div className="h-5 bg-slate-200 rounded w-5/6" />
+                        <div className="h-5 bg-slate-200 rounded w-1/2 block sm:hidden" /> {/* extra line space on mobile if needed */}
+                    </div>
+
+                    {/* Status Badge */}
+                    <div className="h-6 w-24 bg-slate-200 rounded-full shrink-0" />
+                </div>
+
+                {/* Description Textblock Placeholder */}
+                <div className="flex flex-col gap-2">
+                    {/* Title Label */}
+                    <div className="h-3 bg-slate-200 rounded w-36" />
+                    {/* Content Box */}
+                    <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl space-y-2">
+                        <div className="h-3.5 bg-slate-200 rounded w-full" />
+                        <div className="h-3.5 bg-slate-200 rounded w-11/12" />
+                        <div className="h-3.5 bg-slate-200 rounded w-4/5" />
+                    </div>
+                </div>
+
+                {/* Metadata Grid Footer */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                    {/* Category Column */}
+                    <div className="flex flex-col gap-2">
+                        <div className="h-3 bg-slate-200 rounded w-16" />
+                        <div className="h-4 bg-slate-200 rounded w-32" />
+                    </div>
+
+                    {/* Date Column */}
+                    <div className="flex flex-col gap-2">
+                        <div className="h-3 bg-slate-200 rounded w-24" />
+                        <div className="h-4 bg-slate-200 rounded w-28" />
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    );
+}
+
+export function TktMetadata({ targetTkt }) {
+
     const statusStyles = {
         Open: {
             badge: "bg-blue-50 text-blue-700 border-blue-200",
@@ -41,10 +102,6 @@ export default function TktMetadata({ targetTkt }) {
         accent: "bg-slate-400"
     };
 
-    const formattedDate = targetTkt.createdAt
-        ? new Date(targetTkt.createdAt).toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' })
-        : "N/A";
-
     return (
         <section className="w-full bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden relative transition-all duration-200">
             <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${currentStatus.accent}`} />
@@ -54,7 +111,7 @@ export default function TktMetadata({ targetTkt }) {
                     <div className="flex items-center gap-1.5 min-w-0">
                         <Hash size={14} className="text-slate-400 shrink-0" />
                         <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-50 border border-slate-200/60 rounded-lg px-2.5 py-0.5 tracking-wider truncate max-w-full">
-                            {targetTkt.id}
+                            {targetTkt.ticketNumber}
                         </span>
                     </div>
 
@@ -101,7 +158,7 @@ export default function TktMetadata({ targetTkt }) {
                             <Calendar size={12} /> Date Submitted
                         </span>
                         <span className="text-sm font-semibold text-slate-700">
-                            {formattedDate}
+                            {new Date(targetTkt.createdAt).toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' })}
                         </span>
                     </div>
                 </div>

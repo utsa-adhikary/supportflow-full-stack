@@ -1,42 +1,35 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { LogOut, LayoutDashboard, Ticket, ChartSpline, Settings, PanelLeftClose, Plus } from "lucide-react";
 import { useContext } from "react";
-import { MyContext } from "../../App";
+import { ProfileContext } from "../../App";
+import fetchApi from "../../lib/api";
+import toast from "react-hot-toast";
 
 export default function Sidebar({ showSidebar, setShowSidebar }) {
 
-    const [profile] = useContext(MyContext);
+    const { profile, setProfile } = useContext(ProfileContext);
     const navigate = useNavigate();
 
     async function handleLogOut() {
         try {
-            const response = await fetch(`http://localhost:8000/api/auth/logOut`, {
-                credentials: "include"
-            });
+            const data = await fetchApi("/api/auth/logout");
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            console.log(data);
-
-            if (!data.success) {
-                console.log("failed");
-
+            if (data.status !== 200) {
+                console.log("unable to logout try again");
+                // error Toast
+                (() => toast.error("unable to logout try again"))();
                 return;
             }
 
-            navigate("/auth");
+            setProfile(null);
 
             // success Toast
-            (() => toast.success(`Suvvessfully loggedOut`))();
+            (() => toast.success(`Successfully loggedOut`))();
 
             return data;
 
         } catch (error) {
-            console.error(error.message);
+            console.error(error);
         }
     }
 
@@ -88,7 +81,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
                 <div className="flex flex-col gap-1 mt-2">
 
                     <NavLink
-                        to={`/${profile}/dashboard`}
+                        to={"/dashboard"}
                         className={({ isActive }) => `group w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl flex items-center gap-2 sm:gap-3 transition-all duration-200 ${isActive ? "bg-slate-900 text-white shadow-lg shadow-slate-300/40" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}
                         onClick={() => setShowSidebar(false)}
                     >
@@ -102,7 +95,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
                     </NavLink>
 
                     <NavLink
-                        to={`/tickets/`}
+                        to={"/tickets"}
                         className={({ isActive }) => `group w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl flex items-center gap-2 sm:gap-3 transition-all duration-200 ${isActive ? "bg-slate-900 text-white shadow-lg shadow-slate-300/40" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}
                         onClick={() => setShowSidebar(false)}
                     >
@@ -116,7 +109,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
                     </NavLink>
 
                     <NavLink
-                        to={`/${profile}/Analytics`}
+                        to="/analytics"
                         className={({ isActive }) => `group w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl flex items-center gap-2 sm:gap-3 transition-all duration-200 ${isActive ? "bg-slate-900 text-white shadow-lg shadow-slate-300/40" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}
                         onClick={() => setShowSidebar(false)}
                     >
@@ -130,7 +123,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
                     </NavLink>
 
                     <NavLink
-                        to={`/${profile}/Settings`}
+                        to="/settings"
                         className={({ isActive }) => `group w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl flex items-center gap-2 sm:gap-3 transition-all duration-200 ${isActive ? "bg-slate-900 text-white shadow-lg shadow-slate-300/40" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}
                         onClick={() => setShowSidebar(false)}
                     >

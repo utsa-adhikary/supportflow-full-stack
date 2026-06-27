@@ -51,7 +51,12 @@ async function register(req, res) {
 
         res.status(201).json({
             success: true,
-            message: "Registration successful"
+            message: "Registration successful",
+            user: {
+                _id: user.insertedId,
+                name: name,
+                role: "customer"
+            }
         });
 
     } catch (error) {
@@ -109,7 +114,12 @@ async function login(req, res) {
 
         res.status(200).json({
             success: true,
-            message: "Login successful"
+            message: "Login successful",
+            user: {
+                _id: user._id,
+                role: user.role,
+                name: user.name
+            }
         });
 
     } catch (error) {
@@ -136,4 +146,19 @@ async function me(req, res) {
     }
 }
 
-module.exports = { register, login, me }
+async function logout(req, res) {
+    try {
+        res.clearCookie("token");
+        res.status(200).json({
+            success: true,
+            message: "Logged out successfully"
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: "Internal Error"
+        })
+    }
+}
+
+module.exports = { register, login, me, logout }

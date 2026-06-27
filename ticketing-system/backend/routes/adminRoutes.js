@@ -12,14 +12,16 @@ router.get("/stats", authentication, authorization.adminCheck, async (req, res) 
         const ticketsByStatus = await statsModel.ticketsByStatus();
         const ticketsByCategory = await statsModel.ticketsByCategory();
         const resolvedToday = await statsModel.resolvedToday();
+        const createdAt = await statsModel.createdAt();
 
         return res.status(200).json({
             success: true,
-            data: {
+            stat: {
                 totalTickets: ticketCount,
                 ticketsByStatus,
                 resolvedToday,
-                ticketsByCategory
+                ticketsByCategory,
+                createdAt
             }
         });
 

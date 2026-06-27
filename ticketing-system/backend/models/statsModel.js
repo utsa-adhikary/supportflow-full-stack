@@ -40,6 +40,22 @@ async function resolvedToday() {
         })
 }
 
+async function createdAt() {
+    const data = await getCollection().find({}).toArray();
+    const dateObj = {};
+
+    data.forEach(ticket => {
+        const day = new Date(ticket.createdAt).toISOString().split('T')[0];
+        if (dateObj[day]) {
+            dateObj[day]++;
+        } else {
+            dateObj[day] = 1;
+        }
+    });
+
+    return dateObj;
+}
 
 
-module.exports = { totalTickets, ticketsByCategory, ticketsByStatus, resolvedToday }
+
+module.exports = { totalTickets, ticketsByCategory, ticketsByStatus, resolvedToday, createdAt }

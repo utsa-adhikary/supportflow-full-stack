@@ -7,7 +7,7 @@ require("dotenv").config({ quiet: true });
 
 async function authentication(req, res, next) {
     const cookieObj = getCookies(req.headers.cookie);
-
+    
     if (!cookieObj.token) {
         return res.status(401).json(
             {

@@ -1,15 +1,79 @@
 import { Send } from "lucide-react";
 import { useContext, useState, useEffect, useRef } from "react";
-import { MyContext } from "../../App";
+import { ProfileContext } from "../../App";
 
-export default function ChatSec({ targetTkt, setTargetTkt, id }) {
-    const [profile] = useContext(MyContext);
+export function ChatSecSkeleton() {
+    return (
+        <section className="w-full h-150 border border-slate-200 rounded-2xl overflow-hidden bg-white flex flex-col shadow-sm animate-pulse">
+
+            {/* Header Placeholder */}
+            <header className="w-full px-5 py-4 bg-[#EEF4FF] border-b border-[#D7E5FF] shrink-0">
+                <div className="flex flex-col space-y-2">
+                    {/* Header Title Accent */}
+                    <div className="h-3.5 bg-blue-200/70 rounded w-1/4" />
+                    {/* Header Subtitle Accent */}
+                    <div className="h-3 bg-blue-200/40 rounded w-1/2" />
+                </div>
+            </header>
+
+            {/* Chat View Conversation Flow Placeholder */}
+            <div className="flex-1 overflow-y-auto p-4 bg-[#F8FAFC] flex flex-col gap-5">
+
+                {/* Incoming Message Placeholder (Left Aligned) */}
+                <div className="flex flex-col gap-1.5 max-w-[85%] items-start self-start w-2/3">
+                    {/* Bubble */}
+                    <div className="h-10 w-full bg-[#ECFEFF] border border-[#A5F3FC]/50 rounded-2xl rounded-bl-xs" />
+                    {/* Metadata Footer */}
+                    <div className="flex items-center gap-2 px-1">
+                        <div className="size-5 rounded-full bg-slate-200" />
+                        <div className="h-2.5 bg-slate-200 rounded w-12" />
+                    </div>
+                </div>
+
+                {/* Outgoing Message Placeholder (Right Aligned) */}
+                <div className="flex flex-col gap-1.5 max-w-[85%] items-end self-end w-1/2">
+                    {/* Bubble */}
+                    <div className="h-10 w-full bg-slate-200 rounded-2xl rounded-br-xs" />
+                    {/* Metadata Footer */}
+                    <div className="flex items-center gap-2 px-1 flex-row-reverse">
+                        <div className="size-5 rounded-full bg-slate-200" />
+                        <div className="h-2.5 bg-slate-200 rounded w-10" />
+                    </div>
+                </div>
+
+                {/* Incoming Message Placeholder (Left Aligned - Double Bubble) */}
+                <div className="flex flex-col gap-1.5 max-w-[85%] items-start self-start w-3/4">
+                    {/* Bubble */}
+                    <div className="h-14 w-full bg-[#ECFEFF] border border-[#A5F3FC]/50 rounded-2xl rounded-bl-xs" />
+                    {/* Metadata Footer */}
+                    <div className="flex items-center gap-2 px-1">
+                        <div className="size-5 rounded-full bg-slate-200" />
+                        <div className="h-2.5 bg-slate-200 rounded w-16" />
+                    </div>
+                </div>
+
+            </div>
+
+            {/* Footer Input Segment Placeholder */}
+            <div className="w-full p-3 border-t border-zinc-200 bg-white flex items-center gap-2 shrink-0">
+                {/* Textbox block */}
+                <div className="h-9 flex-1 bg-slate-100 border border-zinc-200 rounded-xl" />
+                {/* Send Button block */}
+                <div className="size-9 bg-slate-200 rounded-xl shrink-0" />
+            </div>
+
+        </section>
+    );
+}
+
+export function ChatSec({ messages, setMessages }) {
+    const { profile } = useContext(ProfileContext);
     const [myMsg, setMyMsg] = useState('');
     const chatEndRef = useRef(null);
 
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [targetTkt?.messages]);
+    }, [messages]);
 
     const handleSend = () => {
         if (myMsg.trim() === "") return;
@@ -19,7 +83,7 @@ export default function ChatSec({ targetTkt, setTargetTkt, id }) {
 
         if (targetIndex !== -1) {
             currentTickets[targetIndex].messages = [
-                ...(targetTkt.messages || []),
+                ...(messages || []),
                 {
                     id: crypto.randomUUID(),
                     sender: `${profile}`,
@@ -33,9 +97,6 @@ export default function ChatSec({ targetTkt, setTargetTkt, id }) {
             ];
         }
 
-        localStorage.setItem("tickets", JSON.stringify(currentTickets));
-        setTargetTkt(currentTickets[targetIndex]);
-        setMyMsg('');
     };
 
     return (
@@ -44,7 +105,7 @@ export default function ChatSec({ targetTkt, setTargetTkt, id }) {
             <header className="w-full px-5 py-4 bg-[#EEF4FF] text-[#1E3A8A] border-b border-[#D7E5FF] shrink-0">
                 <div className="flex flex-col">
                     <h2 className="text-sm font-bold uppercase tracking-wider">
-                        {targetTkt.messages.length === 0 ? "Start Conversation" : "Support Conversation"}
+                        {messages.length === 0 ? "Start Conversation" : "Support Conversation"}
                     </h2>
                     <p className="text-xs text-[#5B76B6] mt-0.5">
                         Communicate with the support team in real time
@@ -54,7 +115,7 @@ export default function ChatSec({ targetTkt, setTargetTkt, id }) {
 
             {/* Chat View */}
             <div className="flex-1 overflow-y-auto p-4 bg-[#F8FAFC] flex flex-col gap-4 scrollbar-thin">
-                {targetTkt.messages.length === 0 ? (
+                {messages.length === 0 ? (
                     <div className="m-auto flex flex-col items-center gap-2 text-center">
                         <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-xl">
                             💬
@@ -67,7 +128,7 @@ export default function ChatSec({ targetTkt, setTargetTkt, id }) {
                         </div>
                     </div>
                 ) : (
-                    targetTkt.messages.map((msgobj, key) => {
+                    messages.map((msgobj, key) => {
                         const isMyMsg = msgobj.sender === profile;
                         return (
                             <div

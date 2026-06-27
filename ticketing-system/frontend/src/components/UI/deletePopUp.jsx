@@ -19,7 +19,7 @@ export default function DeleteTicket({ id, deleteTkt, setDeleteTkt }) {
 
             // success Toast
             deleteToast("Successfully Deleted");
-            navigate("/user/dashboard")
+            navigate("/dashboard")
 
         } catch (error) {
             console.error('Error during deletion:', error.message);
