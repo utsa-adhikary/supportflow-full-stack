@@ -28,6 +28,12 @@ function KPIcard({ data }) {
 
 export function KPI({ stat }) {
 
+    console.log("KPI stat:", stat);
+
+    if (!stat) {
+        return <KPISkeleton />;
+    }
+
     const totalOpen = stat.ticketsByStatus.Open;
     const inProgress = stat.ticketsByStatus.InProgress;
     const resolvedToday = stat.resolvedToday;
