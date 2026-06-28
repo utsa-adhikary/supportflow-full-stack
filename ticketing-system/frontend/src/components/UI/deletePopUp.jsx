@@ -1,15 +1,18 @@
-import { Trash2 } from "lucide-react";
+import { Trash2, LoaderCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { deleteToast } from "./Toasts";
 import fetchApi from "../../lib/api";
+import { useState } from "react";
 
 export default function DeleteTicket({ id, setTargetTkt, setDeleteTkt }) {
 
     const navigate = useNavigate();
+    const [disableAnimate, setDisableAnimate] = useState(false);
 
     async function handleDelete() {
 
         try {
+            setDisableAnimate(true);
             const options = {
                 method: "DELETE"
             }
@@ -19,7 +22,9 @@ export default function DeleteTicket({ id, setTargetTkt, setDeleteTkt }) {
             if (data.success === true) {
                 setTargetTkt({})
                 navigate("/dashboard");
+                setDisableAnimate(false);
             } else {
+                setDisableAnimate(false);
                 throw data;
             }
 
@@ -73,7 +78,7 @@ export default function DeleteTicket({ id, setTargetTkt, setDeleteTkt }) {
                         onClick={() => handleDelete()}
                         className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 active:scale-95"
                     >
-                        Delete Ticket
+                        {disableAnimate ? <LoaderCircle className="animate-spin" /> : "Delete Ticket"}
                     </button>
                 </div>
             </div>

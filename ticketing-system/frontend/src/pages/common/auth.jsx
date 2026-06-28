@@ -3,15 +3,19 @@ import toast from "react-hot-toast";
 import { data, useNavigate } from "react-router-dom";
 import fetchApi from '../../lib/api';
 import { ProfileContext } from '../../App';
+import { LoaderCircle } from 'lucide-react';
 
 export default function Auth() {
     const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(true);
     const { profile, setProfile } = useContext(ProfileContext);
+    const [disableAnimate, setDisableAnimate] = useState(false);
 
     async function handleSubmit(event) {
 
         event.preventDefault();
+
+        setDisableAnimate(true);
 
         const formData = new FormData(event.currentTarget);
         const formValues = Object.fromEntries(formData.entries());
@@ -32,9 +36,11 @@ export default function Auth() {
             if (data.success === true) {
                 setProfile(data.user);
             } else {
+                setDisableAnimate(false);
                 throw data;
             }
 
+            setDisableAnimate(false);
             navigate("/dashboard");
 
             // success Toast
@@ -204,8 +210,9 @@ export default function Auth() {
                             <button
                                 type="submit"
                                 className="flex w-full justify-center rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors"
+                                disabled={disableAnimate}
                             >
-                                {isLogin ? 'Sign In' : 'Register'}
+                                {disableAnimate ? <LoaderCircle className="animate-spin" /> : isLogin ? 'Sign In' : 'Register'}
                             </button>
                         </div>
                     </form>

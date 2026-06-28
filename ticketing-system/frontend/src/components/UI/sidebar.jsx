@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { LogOut, LayoutDashboard, Ticket, ChartSpline, Settings, PanelLeftClose, Plus } from "lucide-react";
-import { useContext } from "react";
+import { LogOut, LayoutDashboard, Ticket, ChartSpline, Settings, PanelLeftClose, Plus, LoaderCircle } from "lucide-react";
+import { useContext, useState } from "react";
 import { ProfileContext } from "../../App";
 import fetchApi from "../../lib/api";
 import toast from "react-hot-toast";
@@ -8,17 +8,22 @@ import toast from "react-hot-toast";
 export default function Sidebar({ showSidebar, setShowSidebar }) {
 
     const { profile, setProfile } = useContext(ProfileContext);
+    const [disableAnimate, setDisableAnimate] = useState(false);
     const navigate = useNavigate();
 
     async function handleLogOut() {
         try {
+            setDisableAnimate(true);
             const data = await fetchApi("/api/auth/logout");
 
-            if (data.status !== 200) {
+            if (data.success === true) {
+                setDisableAnimate(false);
+            } else {
                 console.log("unable to logout try again");
+                setDisableAnimate(false);
                 // error Toast
                 (() => toast.error("unable to logout try again"))();
-                return;
+                throw data;
             }
 
             setProfile(null);
@@ -142,7 +147,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
                 <button
 
                     onClick={() => handleLogOut()}
-
+                    disabled={disableAnimate}
                     className="w-full mt-auto px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl flex items-center gap-2 sm:gap-3 bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition-all duration-200">
 
                     <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white flex items-center justify-center">
@@ -150,7 +155,7 @@ export default function Sidebar({ showSidebar, setShowSidebar }) {
                     </div>
 
                     <p className="text-sm sm:text-[15px] lg:text-base font-semibold tracking-wide">
-                        Log Out
+                        {disableAnimate ? <LoaderCircle className="animate-spin" /> : "Log Out"}
                     </p>
 
                 </button>

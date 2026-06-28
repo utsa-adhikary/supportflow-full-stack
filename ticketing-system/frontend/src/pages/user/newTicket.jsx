@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -7,10 +7,13 @@ import fetchApi from "../../lib/api";
 export default function NewTicket() {
 
     const navigate = useNavigate();
+    const [disableAnimate, setDisableAnimate] = useState(false);
 
     async function handleSubmit(event) {
 
         event.preventDefault();
+
+        setDisableAnimate(true);
 
         if (validateForm()) {
             const formData = new FormData(event.currentTarget);
@@ -29,9 +32,10 @@ export default function NewTicket() {
                 if (data.success === true) {
                     setTitle(""); setCategory(""); setPriority(""); setDescription("");
                 } else {
+                    setDisableAnimate(false);
                     throw data;
                 }
-
+                setDisableAnimate(false);
                 navigate("/dashboard");
 
                 // success Toast
@@ -279,9 +283,9 @@ export default function NewTicket() {
                         <button
                             type="submit"
                             className="px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-xs transition duration-150 active:scale-95"
-                        //  disabled={!validateForm()}
+                            disabled={disableAnimate}
                         >
-                            Submit Ticket
+                            {disableAnimate ? <LoaderCircle className="animate-spin" /> : "Submit Ticket"}
                         </button>
 
                     </section>

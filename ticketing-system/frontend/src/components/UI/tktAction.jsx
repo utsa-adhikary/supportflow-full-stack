@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronDown, Trash2, Shield, User } from "lucide-react";
+import { ChevronDown, Trash2, Shield, User, LoaderCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { ProfileContext } from "../../App";
 import fetchApi from "../../lib/api";
@@ -45,10 +45,11 @@ export function TicketActionsSkeleton() {
 
 export function TicketActions({ id, targetTkt, setTargetTkt, setDeleteTkt }) {
     const { profile } = useContext(ProfileContext);
+    const [disableAnimate, setDisableAnimate] = useState(false);
     const navigate = useNavigate();
 
     const [status, setStatus] = useState("");
-    
+
     useEffect(() => {
         if (targetTkt.status) {
             setStatus(targetTkt.status);
@@ -58,6 +59,9 @@ export function TicketActions({ id, targetTkt, setTargetTkt, setDeleteTkt }) {
     async function applyChange() {
 
         try {
+
+            setDisableAnimate(true);
+
             const option = {
                 method: "PATCH",
                 body: JSON.stringify({ status: `${status}`, priority: targetTkt.priority, category: targetTkt.category })
@@ -67,7 +71,9 @@ export function TicketActions({ id, targetTkt, setTargetTkt, setDeleteTkt }) {
 
             if (data.success === true) {
                 setTargetTkt({ ...targetTkt, status: `${status}` });
+                setDisableAnimate(false);
             } else {
+                setDisableAnimate(false);
                 throw data;
             }
 
@@ -81,6 +87,7 @@ export function TicketActions({ id, targetTkt, setTargetTkt, setDeleteTkt }) {
     async function handleResolve() {
 
         try {
+            setDisableAnimate(true);
             const option = {
                 method: "PATCH",
                 body: JSON.stringify({ status: "Resolved" })
@@ -90,7 +97,9 @@ export function TicketActions({ id, targetTkt, setTargetTkt, setDeleteTkt }) {
 
             if (data.success === true) {
                 setTargetTkt({ ...targetTkt, status: "Resolved" });
+                setDisableAnimate(false);
             } else {
+                setDisableAnimate(false);
                 throw data;
             }
 
@@ -141,11 +150,11 @@ export function TicketActions({ id, targetTkt, setTargetTkt, setDeleteTkt }) {
 
                     <div className="flex items-center gap-2.5 pt-1">
                         <button
-                            className="flex-1 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-semibold text-white py-2.5 px-4 transition-all active:scale-[0.98] disabled:bg-indigo-400 disabled:cursor-not-allowed disabled:active:scale-100 disabled:opacity-60 shadow-xs"
-                            disabled={status === targetTkt.status}
+                            className="flex-1 flex justify-center rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-semibold text-white py-2.5 px-4 transition-all active:scale-[0.98] disabled:bg-indigo-400 disabled:cursor-not-allowed disabled:active:scale-100 disabled:opacity-60 shadow-xs"
+                            disabled={status === targetTkt.status || disableAnimate}
                             onClick={() => applyChange()}
                         >
-                            Apply Changes
+                            {disableAnimate ? <LoaderCircle className="animate-spin" /> : "Apply Changes"}
                         </button>
 
                         <button
@@ -176,14 +185,14 @@ export function TicketActions({ id, targetTkt, setTargetTkt, setDeleteTkt }) {
                     <div className="flex items-center gap-2.5">
                         <button
                             onClick={() => handleResolve()}
-                            disabled={targetTkt.status === "Resolved"}
-                            className={`flex-1 rounded-xl py-2.5 px-4 text-xs font-bold transition-all duration-150 active:scale-[0.98]
+                            disabled={targetTkt.status === "Resolved" || disableAnimate}
+                            className={`flex-1 flex justify-center rounded-xl py-2.5 px-4 text-xs font-bold transition-all duration-150 active:scale-[0.98]
                                 ${targetTkt.status === "Resolved"
                                     ? "bg-emerald-50 text-emerald-700 border border-emerald-200/80 pointer-events-none"
                                     : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xs"
                                 }`}
                         >
-                            {targetTkt.status === "Resolved" ? "✓ Resolved" : "Mark as Resolved"}
+                            {disableAnimate ? <LoaderCircle className="animate-spin" /> : targetTkt.status === "Resolved" ? "✓ Resolved" : "Mark as Resolved"}
                         </button>
 
                         <button

@@ -1,4 +1,4 @@
-import { Send } from "lucide-react";
+import { Send, LoaderCircle } from "lucide-react";
 import { useContext, useState, useEffect, useRef } from "react";
 import { ProfileContext } from "../../App";
 import fetchApi from "../../lib/api";
@@ -70,9 +70,9 @@ function ChatSecSkeleton() {
 export default function ChatSec({ id, messages, setMessages }) {
     const { profile } = useContext(ProfileContext);
     const [typedText, setTypedText] = useState("");
-    // const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const chatEndRef = useRef(null);
+    const [disableAnimate, setDisableAnimate] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -101,6 +101,9 @@ export default function ChatSec({ id, messages, setMessages }) {
     }
 
     const handleSend = async () => {
+
+        setDisableAnimate(true);
+
         const cleanlyTrimmed = typedText.trim();
         if (cleanlyTrimmed === "") return;
 
@@ -124,7 +127,9 @@ export default function ChatSec({ id, messages, setMessages }) {
             if (data.success === true) {
                 setMessages(getOnSend.message);
                 setTypedText("");
+                setDisableAnimate(false);
             } else {
+                setDisableAnimate(false);
                 throw data;
             }
         } catch (error) {
@@ -206,10 +211,10 @@ export default function ChatSec({ id, messages, setMessages }) {
                 />
                 <button
                     className="bg-linear-to-r from-[#2563EB] to-[#1D4ED8] hover:opacity-95 text-white p-2.5 rounded-xl font-medium shadow-xs transition active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
-                    disabled={!typedText}
+                    disabled={!typedText || disableAnimate}
                     onClick={handleSend}
                 >
-                    <Send size={15} />
+                    {disableAnimate ? <LoaderCircle className="animate-spin" size={15} /> : <Send size={15} />}
                 </button>
             </div>
         </section>
