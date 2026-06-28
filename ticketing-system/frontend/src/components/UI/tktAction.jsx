@@ -43,61 +43,68 @@ export function TicketActionsSkeleton() {
     );
 }
 
-export function TicketActions({ id, targetTkt, setTargetTkt, deleteTkt, setDeleteTkt }) {
+export function TicketActions({ id, targetTkt, setTargetTkt, setDeleteTkt }) {
     const { profile } = useContext(ProfileContext);
     const navigate = useNavigate();
 
     const [status, setStatus] = useState("");
-
+    
     useEffect(() => {
         if (targetTkt.status) {
             setStatus(targetTkt.status);
         }
-    }, [targetTkt]);
+    }, []);
 
     async function applyChange() {
 
-        const options = {
-            method: "PATCH",
-            body: JSON.stringify({ status: `${status}` })
-        }
-
         try {
-            const response = await fetchApi(`/api/tickets/${id}`, options);
+            const option = {
+                method: "PATCH",
+                body: JSON.stringify({ status: `${status}`, priority: targetTkt.priority, category: targetTkt.category })
+            }
 
-            console.log(response);
+            const data = await fetchApi(`/api/tickets/${id}`, option);
 
-            setTargetTkt({ ...targetTkt, status: `${status}` });
+            if (data.success === true) {
+                setTargetTkt({ ...targetTkt, status: `${status}` });
+            } else {
+                throw data;
+            }
 
-            (() => toast.success("Changes Applied"))();
+            (() => toast.success("Ticket Resolved"))();
+
         } catch (error) {
-            console.error("Failed to update data:", error.message);
+            console.error(error);
         }
     }
 
     async function handleResolve() {
 
         try {
-            const response = await fetchApi(`/api/tickets/${id}`, {
+            const option = {
                 method: "PATCH",
                 body: JSON.stringify({ status: "Resolved" })
-            });
+            }
 
-            console.log("Data received from backend:", response);
+            const data = await fetchApi(`/api/tickets/${id}`, option);
 
-            setTargetTkt({ ...targetTkt, status: "Resolved" });
+            if (data.success === true) {
+                setTargetTkt({ ...targetTkt, status: "Resolved" });
+            } else {
+                throw data;
+            }
 
             (() => toast.success("Ticket Resolved"))();
 
         } catch (error) {
-            console.error("Failed to update data:", error.message);
+            console.error(error);
         }
 
     }
 
     return (
         <section className="w-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden p-5 transition-all duration-200">
-            {profile === "admin" ? (
+            {profile.role === "admin" ? (
 
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-2 pb-2 border-b border-slate-100">

@@ -3,26 +3,30 @@ import { useNavigate } from "react-router-dom";
 import { deleteToast } from "./Toasts";
 import fetchApi from "../../lib/api";
 
-export default function DeleteTicket({ id, deleteTkt, setDeleteTkt }) {
+export default function DeleteTicket({ id, setTargetTkt, setDeleteTkt }) {
 
     const navigate = useNavigate();
 
     async function handleDelete() {
-        const options = {
-            method: "DELETE"
-        }
 
         try {
-            const response = await fetchApi(`/api/tickets/${id}`, options);
+            const options = {
+                method: "DELETE"
+            }
 
-            console.log(response);
+            const data = await fetchApi(`/api/tickets/${id}`, options);
 
-            // success Toast
+            if (data.success === true) {
+                setTargetTkt({})
+                navigate("/dashboard");
+            } else {
+                throw data;
+            }
+
             deleteToast("Successfully Deleted");
-            navigate("/dashboard")
 
         } catch (error) {
-            console.error('Error during deletion:', error.message);
+            console.error(error);
         }
     }
 

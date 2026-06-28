@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import fetchApi from "../../lib/api";
 
 export default function NewTicket() {
 
@@ -16,34 +17,28 @@ export default function NewTicket() {
 
             const formValues = Object.fromEntries(formData.entries());
 
+            const option = {
+
+                method: "POST",
+                body: JSON.stringify(formValues)
+            }
+
             try {
-                const response = await fetch('http://localhost:8000/api/tickets', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formValues)
-                });
+                const data = await fetchApi('/api/tickets', option);
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                if (data.success === true) {
+                    setTitle(""); setCategory(""); setPriority(""); setDescription("");
+                } else {
+                    throw data;
                 }
-
-                const data = await response.json();
-
-                console.log("Data received from backend:", data);
-
-                setTitle(""); setCategory(""); setPriority(""); setDescription("");
 
                 navigate("/dashboard");
 
                 // success Toast
                 (() => toast.success("Ticket Created Successfully."))();
 
-                return data;
-
             } catch (error) {
-                console.error("Failed to create ticket:", error.message);
+                console.error(error);
             }
 
         } else {

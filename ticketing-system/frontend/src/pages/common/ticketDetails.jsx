@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { TktMetadata, TktMetadataSkeleton } from "../../components/UI/tktMetadata";
 import { ArrowLeft } from 'lucide-react';
-import { ChatSec, ChatSecSkeleton } from "../../components/UI/chatSec";
+import ChatSec from "../../components/UI/chatSec";
 import { useContext, useState, useEffect } from "react";
 import { ProfileContext } from "../../App";
 import DeleteTicket from "../../components/UI/deletePopUp";
@@ -17,22 +17,19 @@ export default function TktDetails() {
     const { id } = useParams();
     const [loading, setLoading] = useState(true);
     const [showSidebar, setShowSidebar] = useState(false);
-
+    const [messages, setMessages] = useState([]);
     const [deleteTkt, setDeleteTkt] = useState(false);
-    const [message, setMessage] = useState([]);
     const [targetTkt, setTargetTkt] = useState({});
 
     useEffect(() => {
         (async () => {
             try {
                 const tktData = await fetchApi(`/api/tickets/${id}`);
-                const msgData = await fetchApi(`/api/tickets/${id}/messages`);
 
-                if (tktData.success === true && msgData.success === true) {
+                if (tktData.success === true) {
                     setTargetTkt(tktData.ticket);
-                    setMessage(msgData.message);
                 } else {
-                    throw { tktData, msgData }
+                    throw { tktData }
                 }
             } catch (error) {
                 console.error(error);
@@ -71,7 +68,7 @@ export default function TktDetails() {
 
                     <section className="w-full flex items-center gap-3.5 bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
                         <Link
-                            to={`/${profile}/dashboard`}
+                            to={'/dashboard'}
                             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
                         >
                             <ArrowLeft size={18} />
@@ -97,19 +94,13 @@ export default function TktDetails() {
                                     id={id}
                                     targetTkt={targetTkt}
                                     setTargetTkt={setTargetTkt}
-                                    deleteTkt={deleteTkt}
                                     setDeleteTkt={setDeleteTkt}
                                 />}
 
                         </div>
 
                         <div className="lg:col-span-1 w-full lg:sticky lg:top-6">
-                            {loading ? <ChatSecSkeleton />
-                                : <ChatSec
-                                    messages={message}
-                                    setMessages={setMessage}
-                                    id={id}
-                                />}
+                            <ChatSec id={id} messages={messages} setMessages={setMessages} />
                         </div>
 
                     </div>
@@ -119,9 +110,7 @@ export default function TktDetails() {
             {deleteTkt && (
                 <DeleteTicket
                     id={id}
-                    targetTkt={targetTkt}
                     setTargetTkt={setTargetTkt}
-                    deleteTkt={deleteTkt}
                     setDeleteTkt={setDeleteTkt}
                 />
             )}

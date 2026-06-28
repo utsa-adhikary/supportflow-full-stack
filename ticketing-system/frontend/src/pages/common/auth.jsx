@@ -15,10 +15,6 @@ export default function Auth() {
 
         const formData = new FormData(event.currentTarget);
         const formValues = Object.fromEntries(formData.entries());
-        console.log(formValues);
-        console.log(formData);
-
-
 
         if (!validateForm(formValues)) {
             toast.error("Please fill all fields correctly.");
@@ -35,8 +31,6 @@ export default function Auth() {
 
             if (data.success === true) {
                 setProfile(data.user);
-                console.log(data.user);
-
             } else {
                 throw data;
             }
@@ -79,7 +73,7 @@ export default function Auth() {
                     <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center text-indigo-600 font-black">
                         S
                     </div>
-                    SaaSify
+                    SupportFlow
                 </div>
 
                 <div className="relative z-10 max-w-md">
@@ -96,7 +90,7 @@ export default function Auth() {
                 </div>
 
                 <div className="relative z-10 text-sm text-indigo-200">
-                    © 2026 SaaSify Inc. All rights reserved.
+                    © 2026 SupportFlow Inc. All rights reserved.
                 </div>
             </div>
 
@@ -109,7 +103,7 @@ export default function Auth() {
                         <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-black text-sm">
                             S
                         </div>
-                        SaaSify
+                        SupportFlow
                     </div>
 
                     <h2 className="text-3xl font-bold tracking-tight text-slate-900">

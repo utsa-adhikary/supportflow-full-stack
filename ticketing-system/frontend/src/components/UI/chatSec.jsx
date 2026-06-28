@@ -1,8 +1,9 @@
 import { Send } from "lucide-react";
 import { useContext, useState, useEffect, useRef } from "react";
 import { ProfileContext } from "../../App";
+import fetchApi from "../../lib/api";
 
-export function ChatSecSkeleton() {
+function ChatSecSkeleton() {
     return (
         <section className="w-full h-150 border border-slate-200 rounded-2xl overflow-hidden bg-white flex flex-col shadow-sm animate-pulse">
 
@@ -66,35 +67,68 @@ export function ChatSecSkeleton() {
     );
 }
 
-export function ChatSec({ messages, setMessages }) {
+export default function ChatSec({ id, messages, setMessages }) {
     const { profile } = useContext(ProfileContext);
-    const [myMsg, setMyMsg] = useState('');
+    const [typedText, setTypedText] = useState("");
+    // const [messages, setMessages] = useState([]);
+    const [loading, setLoading] = useState(true);
     const chatEndRef = useRef(null);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const msgData = await fetchApi(`/api/tickets/${id}/messages`);
+
+                if (msgData.success === true) {
+                    setMessages(msgData.message);
+                } else {
+                    throw { msgData }
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, [id]);
 
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    const handleSend = () => {
-        if (myMsg.trim() === "") return;
+    if (loading) {
+        return <ChatSecSkeleton />
+    }
 
-        const currentTickets = JSON.parse(localStorage.getItem("tickets")) || [];
-        const targetIndex = currentTickets.findIndex((tkt) => tkt.id === id);
+    const handleSend = async () => {
+        const cleanlyTrimmed = typedText.trim();
+        if (cleanlyTrimmed === "") return;
 
-        if (targetIndex !== -1) {
-            currentTickets[targetIndex].messages = [
-                ...(messages || []),
+        try {
+            const newMsgObj = {
+                sender:
                 {
-                    id: crypto.randomUUID(),
-                    sender: `${profile}`,
-                    timestamp: `${new Date().toLocaleTimeString('en-GB', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false
-                    })}`,
-                    text: myMsg.trim()
-                }
-            ];
+                    name: profile.name, role: profile.role, id: profile._id
+                },
+                text: cleanlyTrimmed,
+                timestamp: new Date()
+            }
+            const option = {
+                method: "POST",
+                body: JSON.stringify(newMsgObj)
+            }
+
+            const data = await fetchApi(`/api/tickets/${id}/messages`, option);
+            const getOnSend = await fetchApi(`/api/tickets/${id}/messages`);
+
+            if (data.success === true) {
+                setMessages(getOnSend.message);
+                setTypedText("");
+            } else {
+                throw data;
+            }
+        } catch (error) {
+            console.log(error);
         }
 
     };
@@ -129,7 +163,7 @@ export function ChatSec({ messages, setMessages }) {
                     </div>
                 ) : (
                     messages.map((msgobj, key) => {
-                        const isMyMsg = msgobj.sender === profile;
+                        const isMyMsg = msgobj.sender.role === profile.role;
                         return (
                             <div
                                 className={`flex flex-col gap-1 max-w-[85%] ${isMyMsg ? "items-end self-end" : "items-start self-start"}`}
@@ -148,11 +182,11 @@ export function ChatSec({ messages, setMessages }) {
 
                                 <div className={`flex items-center gap-1.5 px-1 mt-0.5 text-[10px] text-zinc-400 ${isMyMsg ? "flex-row-reverse" : "flex-row"}`}>
                                     <div className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[9px] ${isMyMsg ? "bg-blue-100 text-[#0C447C]" : "bg-[#EEEDFE] text-[#3C3489]"}`}>
-                                        {msgobj.sender === "user" ? "U" : "A"}
+                                        {msgobj.sender.name[0].toUpperCase()}
                                     </div>
-                                    <span className="font-semibold text-zinc-600 capitalize">{msgobj.sender}</span>
+                                    <span className="font-semibold text-zinc-600 capitalize">{msgobj.sender.name}</span>
                                     <span>•</span>
-                                    <span>{msgobj.timestamp}</span>
+                                    <span>{new Date(msgobj.timestamp).toLocaleString()}</span>
                                 </div>
                             </div>
                         );
@@ -165,14 +199,14 @@ export function ChatSec({ messages, setMessages }) {
                 <input
                     type="text"
                     placeholder="Type your message..."
-                    value={myMsg}
+                    value={typedText}
                     className="flex-1 border border-zinc-300 rounded-xl px-3 py-2.5 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition text-xs text-slate-700"
-                    onChange={(e) => setMyMsg(e.target.value)}
+                    onChange={(e) => setTypedText(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 />
                 <button
                     className="bg-linear-to-r from-[#2563EB] to-[#1D4ED8] hover:opacity-95 text-white p-2.5 rounded-xl font-medium shadow-xs transition active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
-                    disabled={!myMsg.trim()}
+                    disabled={!typedText}
                     onClick={handleSend}
                 >
                     <Send size={15} />
