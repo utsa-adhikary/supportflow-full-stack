@@ -8,9 +8,9 @@ async function seedUser() {
         if (userCount === 0) {
             console.log("Users collection is empty. Seeding initial users...");
             const documents = [
-                { name: 'Admin User', email: 'admin@support.com', password: 'admin123', role: 'admin' },
-                { name: 'Alice Johnson', email: 'alice@example.com', password: 'password123', role: 'customer' },
-                { name: 'Bob Smith', email: 'bob@example.com', password: 'password123', role: 'customer' }
+                { name: 'Admin User', email: 'admin@support.com', password: 'admin123', role: 'admin', default: true },
+                { name: 'Alice Johnson', email: 'alice@example.com', password: 'password123', role: 'customer', default: true },
+                { name: 'Bob Smith', email: 'bob@example.com', password: 'password123', role: 'customer', default: true }
             ];
 
             for (const entry of documents) {
@@ -165,7 +165,7 @@ async function seedTicket() {
 
             createdAt.sort((a, b) => a - b);
 
-            const createdBy = await getdb().collection("users").find({ role: "customer" }, { projection: { _id: 1 } }).toArray();
+            const createdBy = await getdb().collection("users").find({ role: "customer", default: true }, { projection: { _id: 1 } }).toArray();
 
             const tktArray = [];
 

@@ -60,9 +60,9 @@ async function sendChat(req, res) {
             })
         }
 
-        let { text } = req.body;
+        const newMsgObj = req.body;
 
-        text = (text || "").trim();
+        const text = (newMsgObj.text || "").trim();
 
         if (!text || text.length > 2000) {
             return res.status(400).json({
@@ -71,17 +71,7 @@ async function sendChat(req, res) {
             })
         }
 
-        const newMsg = {
-            sender: {
-                _id: req.user._id,
-                name: req.user.name,
-                role: req.user.role
-            },
-            text,
-            timestamp: new Date()
-        };
-
-        await msgModel.sendChat(req.params.ticket_id, newMsg);
+        await msgModel.sendChat(req.params.ticket_id, newMsgObj);
 
         return res.status(200).json({
             success: true,
