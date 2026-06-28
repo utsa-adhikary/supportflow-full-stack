@@ -77,7 +77,7 @@ export function TicketActions({ id, targetTkt, setTargetTkt, setDeleteTkt }) {
                 throw data;
             }
 
-            (() => toast.success("Ticket Resolved"))();
+            (() => toast.success("Changes Applied Successfully"))();
 
         } catch (error) {
             console.error(error);
