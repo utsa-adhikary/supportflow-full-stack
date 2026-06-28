@@ -52,8 +52,6 @@ export default function Dashboard() {
 
                 <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
 
-                {profile.role === "admin" ?
-
                     <div className="flex-1 flex flex-col md:pl-65 lg:pl-70 xl:pl-80 transition-all duration-300 min-w-0">
 
                         <Header showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
@@ -94,22 +92,6 @@ export default function Dashboard() {
 
                         </div>
                     </div>
-
-                    :
-
-                    <div className="flex-1 flex flex-col md:ml-65 lg:ml-70 xl:ml-80">
-
-                        <Header
-                            showSidebar={showSidebar}
-                            setShowSidebar={setShowSidebar}
-                        />
-
-                        <div className="flex-1 p-3 sm:p-4 md:p-5 lg:p-6">
-                            {loading ? <TicketViewSkeleton /> : <TicketView tickets={tickets} />}
-                        </div>
-
-                    </div>
-                }
             </main>
         </>
     )
